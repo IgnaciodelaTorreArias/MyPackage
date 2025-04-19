@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Authors>lazy_engineer</Authors>
+	<Description>FFI: Calling Functions via C ABI with Protobuf-based Arguments and Results</Description>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>0.1.0</Version>
+	<RuntimeIdentifiers>win-x64;linux-x64;</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Protobuf Include="my_rust_protos\protos\Response.proto" GrpcServices="None" AdditionalImportDirs="my_rust_protos\protos" />
+    <Protobuf Include="my_rust_protos\protos\Person.proto" GrpcServices="None" AdditionalImportDirs="my_rust_protos\protos" />
+    <Protobuf Include="my_rust_protos\protos\Greetings.proto" GrpcServices="None" AdditionalImportDirs="my_rust_protos\protos" />
+    <Protobuf Include="my_rust_protos\protos\Error.proto" GrpcServices="None" AdditionalImportDirs="my_rust_protos\protos" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="runtimes\win-x64\native\my_rust_protos.dll" Pack="true" PackagePath="runtimes/win-x64/native/" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="runtimes\linux-x64\native\libmy_rust_protos.so" Pack="true" PackagePath="runtimes/linux-x64/native/" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="runtimes\linux-x64\native\" />
+  </ItemGroup>
+	
+</Project>

@@ -1,0 +1,15 @@
+This are common targets that cover a big percentage of dotnet projects, with their respective rust target
+dotnet		|rust
+---
+win-x64		|x86_64-pc-windows-msvc
+linux-x64	|x86_64-unknown-linux-gnu
+osx-x64		|x86_64-apple-darwin
+osx-arm64	|aarch64-apple-darwin
+
+win-arm64	|aarch64-pc-windows-msvc
+linux-arm64	|aarch64-unknown-linux-gnu # Devices like raspberry
+android-arm64	|aarch64-linux-android
+
+# Containers with alpine
+linux-musl-x64	|x86_64-unknown-linux-musl
+linux-musl-arm64|aarch64-unknown-linux-musl
