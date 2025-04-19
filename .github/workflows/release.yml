@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        submodule: recursive
+        submodules: recursive
 
     - name: install packages
       run: |
@@ -40,6 +40,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - uses: dtolnay/rust-toolchain@stable
       with:
