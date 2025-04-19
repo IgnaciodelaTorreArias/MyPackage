@@ -61,7 +61,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-native
-        path: .\target\x86_64-pc-windows-msvc\release\my_rust_protos.dll
+        path: .\my_rust_protos\target\x86_64-pc-windows-msvc\release\my_rust_protos.dll
 
   pack:
     runs-on: ubuntu-latest
