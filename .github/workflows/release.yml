@@ -4,7 +4,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc
+
+    - name: Install protoc
+      run: |
+        $PROTOC_ZIP = "protoc-30.2-win64.zip"
+        Invoke-WebRequest -Uri "https://github.com/protocolbuffers/protobuf/releases/download/v30.2/$PROTOC_ZIP" -OutFile $PROTOC_ZIP
+        Expand-Archive -Path $PROTOC_ZIP -DestinationPath protoc
+        Add-Content $env:GITHUB_PATH "$PWD\protoc\bin"
+
+    - name: Build Rust DLL
+      run: cargo build --manifest-path .\my_rust_protos\Cargo.toml --release --target x86_64-pc-windows-msvc
+
+    - name: Upload DLL
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-native
+        path: .\my_rust_protos\target\x86_64-pc-windows-msvc\release\my_rust_protos.dll
+
   build-linux:
+    needs: build-windows
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -36,70 +64,21 @@ jobs:
         name: linux-native
         path: my_rust_protos/target/x86_64-unknown-linux-gnu/release/libmy_rust_protos.so
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: x86_64-pc-windows-msvc
-
-    - name: Install protoc
-      run: |
-        $PROTOC_ZIP = "protoc-30.2-win64.zip"
-        Invoke-WebRequest -Uri "https://github.com/protocolbuffers/protobuf/releases/download/v30.2/$PROTOC_ZIP" -OutFile $PROTOC_ZIP
-        Expand-Archive -Path $PROTOC_ZIP -DestinationPath protoc
-        Add-Content $env:GITHUB_PATH "$PWD\protoc\bin"
-
-    - name: Build Rust DLL
-      run: cargo build --manifest-path .\my_rust_protos\Cargo.toml --release --target x86_64-pc-windows-msvc
-
-    - name: Upload DLL
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-native
-        path: .\my_rust_protos\target\x86_64-pc-windows-msvc\release\my_rust_protos.dll
-
-  pack:
-    runs-on: ubuntu-latest
-    needs: [build-linux, build-windows]
-
-    steps:
-    - uses: actions/checkout@v4
-
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '6.0.428'
 
-    - name: Download Linux .so
-      uses: actions/download-artifact@v4
-      with:
-        name: linux-native
-        path: runtimes/linux-x64/native
-
-    - name: Download Windows DLL
-      uses: actions/download-artifact@v4
-      with:
-        name: windows-native
-        path: runtimes/win-x64/native
-
-    - name: List native files
-      run: ls -R runtimes
-
     - name: Run dotnet pack
-      run: dotnet pack -c Release
+      run: dotnet pack MyPackage.csproj -c Release
 
     - name: Upload .nupkg
       uses: actions/upload-artifact@v4
       with:
-        name: full-nuget-package
-        path: '**/*.nupkg'
+        name: MyPackage
+        path: 'bin/Release/*.nupkg'
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: '**/*.nupkg'
+        files: 'bin/Release/*.nupkg'
