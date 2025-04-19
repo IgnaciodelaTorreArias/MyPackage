@@ -65,7 +65,9 @@ jobs:
         path: my_rust_protos/target/x86_64-unknown-linux-gnu/release/libmy_rust_protos.so
 
     - name: Copy .so
-      run: cp my_rust_protos/target/x86_64-unknown-linux-gnu/release/libmy_rust_protos.so runtimes/linux-x64/native
+      run: |
+        mkdir -p runtimes/linux-x64/native
+        cp my_rust_protos/target/x86_64-unknown-linux-gnu/release/libmy_rust_protos.so runtimes/linux-x64/native
 
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v4
